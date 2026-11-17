@@ -84,6 +84,9 @@ section{scroll-margin-top:70px}
 .sec-head p{max-width:46ch;color:var(--muted);margin:0}
 
 /* catálogo */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.tab{font:inherit;font-weight:600;font-size:15px;padding:10px 16px;border:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:2px;cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px}
 .card{display:flex;flex-direction:column;gap:14px;min-width:0}
 .card .plate{aspect-ratio:4/3}
@@ -167,7 +170,7 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
       <div>
         <div class="eyebrow">Herrería y carpintería · Santa Fe</div>
         <h1>Muebles con carácter, <em>hechos a tu medida.</em></h1>
-        <p class="lead">Mesas, racks, escritorios y más, soldados y armados a mano, uno por uno. Elegí un modelo del catálogo o pasanos tus medidas y lo fabricamos para vos.</p>
+        <p class="lead">Mesas, racks, escritorios y muebles para la galería, soldados y armados a mano, uno por uno. Elegí un modelo del catálogo o pasanos tus medidas y lo fabricamos para vos.</p>
         <div class="ctas">
           <a class="btn primary" href="#catalogo">Ver catálogo</a>
           <a class="btn" data-wa="Hola! Quería pedir un presupuesto para un mueble a medida." href="#contacto" target="_blank" rel="noopener">Escribinos por WhatsApp</a>
@@ -190,6 +193,10 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
       <div class="sec-head">
         <div><div class="eyebrow">Catálogo 2026</div><h2>Nuestros muebles</h2></div>
         <p>Cada modelo se puede hacer en otras medidas, con otra madera o en otro color. Las fotos son de referencia; te mandamos el boceto final antes de fabricar.</p>
+      </div>
+      <div class="tabs" role="group" aria-label="Filtrar catálogo">
+        <button type="button" class="tab" data-tab="interior" aria-pressed="true">Interior</button>
+        <button type="button" class="tab" data-tab="exterior" aria-pressed="false">Exterior: parrilla y galería</button>
       </div>
       <div class="grid" id="grid"></div>
       <div class="custom">
@@ -315,8 +322,17 @@ const PRODUCTOS = [
   { code:"RC-01", nombre:"Recibidor", desc:"Para la entrada de casa: arriba llaves y portarretratos, abajo zapatos y canastos.",
     medidas:"100 × 30 × 90 cm", hierro:"Caño 40×40", madera:"Pino 1½\" y tinte nogal", foto:"img/recibidor-entrada.jpg" },
   { code:"BQ-01", nombre:"Banqueta plegable", desc:"Asiento de madera maciza con apoyapiés. Se pliega y se guarda en cualquier rincón.",
-    medidas:"36 × 36 × 65 cm", hierro:"Caño 20×20", madera:"Paraíso 1½\"", draw:"banqueta", foto:"img/banqueta-plegable-estudio.jpg" }
+    medidas:"36 × 36 × 65 cm", hierro:"Caño 20×20", madera:"Paraíso 1½\"", draw:"banqueta", foto:"img/banqueta-plegable-estudio.jpg" },
+  { cat:"exterior", code:"MG-01", nombre:"Mesa para galería", desc:"Mesa larga para 8 personas, para el quincho o la galería. Combina con los bancos.",
+    medidas:"200 × 90 × 75 cm", hierro:"Caño 40×40, pintura para exterior", madera:"Eucalipto con aceite", foto:"img/mesa-galeria-quincho.jpg" },
+  { cat:"exterior", code:"BG-01", nombre:"Banco para galería", desc:"Banco largo de tablones. Va con la mesa de galería o solo, contra la pared.",
+    medidas:"180 × 35 × 45 cm", hierro:"Caño 40×40, pintura para exterior", madera:"Eucalipto con aceite", foto:"img/banco-galeria.jpg" },
+  { cat:"exterior", code:"LE-01", nombre:"Leñero", desc:"Para tener la leña ordenada y a mano al lado de la parrilla. Arriba, lugar para la pava y los fósforos.",
+    medidas:"60 × 35 × 120 cm", hierro:"Caño 20×20 y metal desplegado", madera:"Eucalipto con aceite", foto:"img/lenero-parrilla.jpg" },
+  { cat:"exterior", code:"MP-01", nombre:"Mesada parrillera", desc:"Mesa auxiliar para cortar y apoyar todo al lado de la parrilla. Ganchos para los utensilios y estante de listones abajo.",
+    medidas:"100 × 50 × 85 cm", hierro:"Caño 20×20, pintura para exterior", madera:"Eucalipto con aceite", foto:"img/mesada-parrillera-patio.jpg" }
 ];
+PRODUCTOS.forEach(p=>{ if(!p.cat) p.cat="interior"; });
 
 /* ===== Dibujos: cajas en proyección oblicua (medidas en cm) ===== */
 const MAT = {
@@ -432,7 +448,7 @@ document.getElementById("hero-plate").insertAdjacentHTML("afterbegin", drawModel
 
 const grid=document.getElementById("grid");
 grid.innerHTML = PRODUCTOS.map(p=>`
-  <article class="card">
+  <article class="card" data-cat="${p.cat}"${p.cat!=="interior"?" hidden":""}>
     <div class="plate">${p.draw?drawModel(p.draw):""}<img class="foto" src="${p.foto}" alt="${esc(p.nombre)} de hierro y madera en un ambiente" loading="lazy" onerror="this.remove()"></div>
     <div class="card-top"><h3>${esc(p.nombre)}</h3><span class="code">${p.code}</span></div>
     <p>${esc(p.desc)}</p>
@@ -446,8 +462,14 @@ grid.innerHTML = PRODUCTOS.map(p=>`
 document.querySelectorAll("[data-wa]").forEach(a=>a.href=waLink(a.dataset.wa));
 document.querySelectorAll("[data-ig]").forEach(a=>a.href=`https://instagram.com/${CONFIG.instagram}`);
 
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-pressed",String(x===t)));
+  grid.querySelectorAll(".card").forEach(c=>c.hidden=c.dataset.cat!==t.dataset.tab);
+}));
+
 const sel=document.getElementById("f-mueble");
-sel.innerHTML = PRODUCTOS.map(p=>`<option value="${p.code}">${esc(p.nombre)} (${p.code})</option>`).join("")+`<option value="otro">Otro / diseño propio</option>`;
+const opts=c=>PRODUCTOS.filter(p=>p.cat===c).map(p=>`<option value="${p.code}">${esc(p.nombre)} (${p.code})</option>`).join("");
+sel.innerHTML = `<optgroup label="Interior">${opts("interior")}</optgroup><optgroup label="Exterior">${opts("exterior")}</optgroup><option value="otro">Otro / diseño propio</option>`;
 document.querySelectorAll("[data-pick]").forEach(a=>a.addEventListener("click",()=>{ sel.value=a.dataset.pick; }));
 
 const form=document.getElementById("form"), result=document.getElementById("result");
