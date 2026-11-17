@@ -112,6 +112,20 @@ dl.specs dd{margin:0;font-variant-numeric:tabular-nums}
 @media (max-width:900px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:520px){.steps{grid-template-columns:1fr}}
 
+/* asesoramiento */
+.advice{background:var(--steel);color:#F3F3F1}
+.advice .eyebrow{color:#B9BEC3}
+.advice-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+.advice h2{font-size:clamp(38px,5vw,60px);margin:8px 0 16px}
+.advice p{color:#D4D7DA;margin:0 0 14px;max-width:52ch}
+.advice .btn.primary{margin-top:8px}
+.advice ul{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.advice li{border:1px solid #4A5057;padding:16px 18px;display:grid;gap:4px}
+.advice li strong{font-family:var(--f-display);font-size:24px;text-transform:uppercase;font-weight:800;letter-spacing:.01em}
+.advice li span{color:#C3C7CB;font-size:15px}
+.advice li strong::before{content:"";display:inline-block;width:10px;height:10px;background:var(--accent);margin-right:10px;vertical-align:middle}
+@media (max-width:860px){.advice-in{grid-template-columns:1fr;gap:28px}}
+
 /* seguimiento */
 .track{margin-top:48px;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:40px;align-items:start;border:2px solid var(--ink);background:var(--bg);padding:28px}
 .track h3{font-size:clamp(30px,3.6vw,42px);margin:8px 0 12px}
@@ -170,6 +184,7 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
     </a>
     <nav class="links" aria-label="Secciones">
       <a href="#catalogo">Catálogo</a>
+      <a href="#asesoramiento">Asesoramiento</a>
       <a href="#como-trabajamos">Cómo trabajamos</a>
       <a href="#materiales">Materiales</a>
       <a class="btn primary small" href="#contacto">Pedí tu presupuesto</a>
@@ -214,9 +229,26 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
       </div>
       <div class="grid" id="grid"></div>
       <div class="custom">
-        <div><strong>¿Tenés otra idea?</strong><p>Mandanos una foto de referencia y las medidas del espacio. Lo dibujamos y te pasamos precio.</p></div>
+        <div><strong>¿Tenés otra idea?</strong><p>Mandanos una foto de referencia y las medidas del espacio. Lo dibujamos y te pasamos precio. Y si no sabés por dónde empezar, <a href="#asesoramiento">te asesoramos</a>.</p></div>
         <a class="btn primary" href="#contacto">Pedir algo a medida</a>
       </div>
+    </div>
+  </section>
+
+  <section id="asesoramiento" class="sec advice">
+    <div class="wrap advice-in">
+      <div>
+        <div class="eyebrow">Asesoramiento en diseño</div>
+        <h2>¿No sabés qué mueble te conviene?</h2>
+        <p>No hace falta que vengas con la idea armada. Te acompaña una diseñadora de interiores que mira tu espacio con vos y te ayuda a definir qué mueble necesitás, en qué medidas y con qué terminación para que quede bien con el resto de tu casa.</p>
+        <p>Así, lo que fabricamos no solo es resistente: también es el mueble justo para ese lugar.</p>
+        <a class="btn primary" href="#contacto" data-pick="asesoramiento">Quiero asesoramiento</a>
+      </div>
+      <ul>
+        <li><strong>Nos mostrás tu espacio</strong><span>Mandanos fotos y medidas del ambiente, o lo vemos juntos por videollamada.</span></li>
+        <li><strong>Te proponemos ideas</strong><span>Opciones de mueble, tamaño, madera y color del hierro según tu estilo y cómo usás el espacio.</span></li>
+        <li><strong>Boceto y presupuesto</strong><span>Te mandamos el diseño final con medidas y precio cerrado. Recién ahí arrancamos a fabricar.</span></li>
+      </ul>
     </div>
   </section>
 
@@ -506,7 +538,7 @@ document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
 
 const sel=document.getElementById("f-mueble");
 const opts=c=>PRODUCTOS.filter(p=>p.cat===c).map(p=>`<option value="${p.code}">${esc(p.nombre)} (${p.code})</option>`).join("");
-sel.innerHTML = `<optgroup label="Interior">${opts("interior")}</optgroup><optgroup label="Exterior">${opts("exterior")}</optgroup><option value="otro">Otro / diseño propio</option>`;
+sel.innerHTML = `<optgroup label="Interior">${opts("interior")}</optgroup><optgroup label="Exterior">${opts("exterior")}</optgroup><option value="otro">Otro / diseño propio</option><option value="asesoramiento">No sé bien: quiero asesoramiento</option>`;
 document.querySelectorAll("[data-pick]").forEach(a=>a.addEventListener("click",()=>{ sel.value=a.dataset.pick; }));
 
 const form=document.getElementById("form"), result=document.getElementById("result");
@@ -517,7 +549,7 @@ form.addEventListener("submit",e=>{
   if(!nombre){ hint.textContent="Poné tu nombre así sabemos a quién responderle."; document.getElementById("f-nombre").focus(); return; }
   hint.textContent="Revisá el mensaje y mandalo por donde prefieras.";
   const p=PRODUCTOS.find(x=>x.code===f.get("mueble"));
-  const lines=[`Hola! Soy ${nombre}.`, `Quiero consultar por: ${p?`${p.nombre} (${p.code})`:"un mueble a medida"}.`];
+  const lines=[`Hola! Soy ${nombre}.`, f.get("mueble")==="asesoramiento"?"Quiero asesoramiento para elegir o diseñar un mueble.":`Quiero consultar por: ${p?`${p.nombre} (${p.code})`:"un mueble a medida"}.`];
   if(f.get("medidas").trim()) lines.push(`Medidas: ${f.get("medidas").trim()}.`);
   if(f.get("zona").trim()) lines.push(`Zona: ${f.get("zona").trim()}.`);
   if(f.get("mensaje").trim()) lines.push("", f.get("mensaje").trim());
