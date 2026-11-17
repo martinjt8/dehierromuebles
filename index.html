@@ -302,6 +302,8 @@ const CONFIG = {
 const PRODUCTOS = [
   { code:"MR-01", nombre:"Mesa ratonera", desc:"Tapa maciza y estante abajo para revistas o canastos. Estructura de caño soldado.",
     medidas:"110 × 60 × 45 cm", hierro:"Caño 40×40", madera:"Pino 1½\"", draw:"ratonera", foto:"img/mesa-ratonera-living.jpg" },
+  { code:"MR-02", nombre:"Mesa ratonera elevable", desc:"La tapa sube y se adelanta para comer o trabajar desde el sillón. Con ruedas para moverla fácil.",
+    medidas:"100 × 50 × 45 cm", hierro:"Caño 40×40", madera:"Pino 1½\"", foto:"img/mesa-ratonera-elevable-living.jpg" },
   { code:"ML-01", nombre:"Mesa de luz", desc:"Con cajón con guías y estante inferior. Se hace de a una o en par.",
     medidas:"45 × 35 × 55 cm", hierro:"Caño 20×20", madera:"Pino 1\"", draw:"luz", foto:"img/mesa-de-luz-dormitorio.jpg" },
   { code:"RT-01", nombre:"Rack para TV", desc:"Un módulo cerrado con puertas y otro abierto para equipos. Para teles de hasta 65\".",
@@ -310,6 +312,8 @@ const PRODUCTOS = [
     medidas:"120 × 60 × 75 cm", hierro:"Caño 40×40", madera:"Pino 1½\"", draw:"escritorio", foto:"img/escritorio-pared-ladrillo.jpg" },
   { code:"BI-01", nombre:"Biblioteca", desc:"Seis estantes sobre laterales tipo escalera. Ideal para living o estudio.",
     medidas:"120 × 32 × 200 cm", hierro:"Caño 20×20", madera:"Pino 1\"", draw:"biblioteca", foto:"img/biblioteca-living.jpg" },
+  { code:"RC-01", nombre:"Recibidor", desc:"Para la entrada de casa: arriba llaves y portarretratos, abajo zapatos y canastos.",
+    medidas:"100 × 30 × 90 cm", hierro:"Caño 40×40", madera:"Pino 1½\" y tinte nogal", foto:"img/recibidor-entrada.jpg" },
   { code:"BQ-01", nombre:"Banqueta plegable", desc:"Asiento de madera maciza con apoyapiés. Se pliega y se guarda en cualquier rincón.",
     medidas:"36 × 36 × 65 cm", hierro:"Caño 20×20", madera:"Paraíso 1½\"", draw:"banqueta", foto:"img/banqueta-plegable-estudio.jpg" }
 ];
@@ -429,7 +433,7 @@ document.getElementById("hero-plate").insertAdjacentHTML("afterbegin", drawModel
 const grid=document.getElementById("grid");
 grid.innerHTML = PRODUCTOS.map(p=>`
   <article class="card">
-    <div class="plate">${drawModel(p.draw)}<img class="foto" src="${p.foto}" alt="${esc(p.nombre)} de hierro y madera en un ambiente" loading="lazy" onerror="this.remove()"></div>
+    <div class="plate">${p.draw?drawModel(p.draw):""}<img class="foto" src="${p.foto}" alt="${esc(p.nombre)} de hierro y madera en un ambiente" loading="lazy" onerror="this.remove()"></div>
     <div class="card-top"><h3>${esc(p.nombre)}</h3><span class="code">${p.code}</span></div>
     <p>${esc(p.desc)}</p>
     <dl class="specs"><dt>Medidas</dt><dd>${p.medidas} <span class="mono" style="color:var(--muted);font-size:12px">largo × prof. × alto</span></dd><dt>Hierro</dt><dd>${esc(p.hierro)}</dd><dt>Madera</dt><dd>${esc(p.madera)}</dd></dl>
