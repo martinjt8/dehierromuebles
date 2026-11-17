@@ -1,6 +1,6 @@
-# De Hierro Muebles SF
+# De Hierro Muebles
 
-Página web de De Hierro Muebles SF: muebles de hierro y madera hechos a medida en Santa Fe.
+Página web de De Hierro Muebles: muebles de hierro y madera hechos a medida en Santa Fe.
 
 Es un sitio estático de un solo archivo (`index.html`) publicado con GitHub Pages.
 
