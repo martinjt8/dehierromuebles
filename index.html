@@ -77,7 +77,7 @@ header.top .btn{white-space:nowrap}
 
 .hazard{height:14px;background:repeating-linear-gradient(-45deg,var(--accent) 0 14px,var(--steel) 14px 28px)}
 
-section{scroll-margin-top:70px}
+section,#seguimiento{scroll-margin-top:70px}
 .sec{padding-block:72px}
 .sec-head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap;margin-bottom:32px}
 .sec-head h2{font-size:clamp(38px,5vw,60px);margin-top:8px}
@@ -111,6 +111,54 @@ dl.specs dd{margin:0;font-variant-numeric:tabular-nums}
 .steps p{margin:0;color:var(--muted);font-size:15px}
 @media (max-width:900px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:520px){.steps{grid-template-columns:1fr}}
+
+/* carrusel de portada */
+.slides{position:absolute;inset:0}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .9s ease}
+.slide.on{opacity:1}
+.slide img{width:100%;height:100%;object-fit:cover;object-position:60% 50%;display:block}
+.slide-label{position:absolute;left:0;bottom:0;max-width:calc(100% - 24px);display:flex;align-items:center;gap:14px;background:rgba(20,22,25,.86);color:#F3F3F1;padding:14px 18px;text-decoration:none;z-index:2;border-left:6px solid var(--accent)}
+.slide-label small{display:block;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#B9BEC3}
+.slide-label strong{display:block;font-family:var(--f-display);font-weight:800;font-size:clamp(22px,2.6vw,30px);text-transform:uppercase;line-height:1}
+.slide-label .go{font-size:13.5px;font-weight:600;white-space:nowrap;border-left:1px solid #4A5057;padding-left:14px}
+.slide-label:hover .go{text-decoration:underline;text-underline-offset:3px}
+.slide-ctrl{position:absolute;right:12px;top:12px;display:flex;gap:6px;align-items:center;z-index:2}
+.slide-ctrl button{width:38px;height:38px;border:0;background:rgba(20,22,25,.78);color:#F3F3F1;font-size:18px;cursor:pointer;display:grid;place-items:center;border-radius:2px}
+.slide-ctrl button:hover{background:rgba(20,22,25,.95)}
+.slide-ctrl .count{font-family:var(--f-mono);font-size:12px;background:rgba(20,22,25,.78);color:#F3F3F1;padding:0 10px;height:38px;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.slide-bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:transparent;z-index:3}
+.slide-bar i{display:block;height:100%;width:0;background:var(--accent)}
+.slide-bar i.run{width:100%;transition:width linear}
+@media (max-width:520px){.slide-label .go{display:none}.slide-label{padding:12px 14px}}
+
+/* ficha de cada mueble */
+a.plate,span.plate{display:block}
+.card .actions .btn{flex:1 1 auto}
+.ficha{padding-block:32px 72px}
+.crumbs{font-family:var(--f-mono);font-size:12.5px;letter-spacing:.06em;color:var(--muted);margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap}
+.crumbs a{color:var(--muted)}
+.ficha-main{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:48px;align-items:start}
+.ficha-main .plate{aspect-ratio:4/3}
+.ficha h1{font-size:clamp(44px,6vw,80px);margin:8px 0 18px}
+.ficha .intro{font-size:18px;margin:0 0 14px}
+.ficha .more{color:var(--muted);margin:0 0 22px}
+.ficha dl.specs{margin-bottom:24px}
+.ficha .ctas{display:flex;gap:12px;flex-wrap:wrap}
+.ficha-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:56px}
+.ficha-cols>div{border-top:3px solid var(--ink);padding-top:14px}
+.ficha-cols h2{font-size:26px;margin-bottom:10px}
+.ficha-cols ul{margin:0;padding-left:18px;color:var(--muted);display:grid;gap:6px}
+.ficha-cols p{margin:0;color:var(--muted)}
+.ficha-cols a{color:var(--ink)}
+.related{margin-top:64px}
+.related h2{font-size:clamp(30px,4vw,44px);margin-bottom:20px}
+.mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.mini a{text-decoration:none;display:grid;gap:10px}
+.mini .plate{aspect-ratio:4/3}
+.mini strong{font-family:var(--f-display);font-weight:800;font-size:24px;text-transform:uppercase}
+.mini a:hover strong{text-decoration:underline;text-underline-offset:4px}
+@media (max-width:860px){.ficha-main,.ficha-cols{grid-template-columns:1fr}.ficha-main{gap:24px}.ficha-cols{gap:24px;margin-top:40px}.mini{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.mini{grid-template-columns:1fr}}
 
 /* asesoramiento */
 .advice{background:var(--steel);color:#F3F3F1}
@@ -211,8 +259,12 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
           <li>Coordinamos el envío hasta tu casa</li>
         </ul>
       </div>
-      <div class="plate" id="hero-plate">
-              </div>
+      <div class="plate" id="hero-plate" role="region" aria-roledescription="carrusel" aria-label="Muebles del catálogo">
+        <div class="slides" id="slides"></div>
+        <a class="slide-label" id="slide-label" href="#"><span><small id="slide-cat"></small><strong id="slide-name"></strong></span><span class="go">Ver detalles →</span></a>
+        <div class="slide-ctrl"><button type="button" id="slide-prev" aria-label="Mueble anterior">←</button><span class="count" id="slide-count" aria-live="polite"></span><button type="button" id="slide-next" aria-label="Mueble siguiente">→</button></div>
+        <div class="slide-bar" aria-hidden="true"><i id="slide-bar"></i></div>
+      </div>
     </div>
   </section>
   <div class="hazard" aria-hidden="true"></div>
@@ -356,6 +408,8 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
   </section>
 </main>
 
+<main id="ficha" class="ficha" hidden></main>
+
 <footer><div class="wrap"><span>© 2026 <span data-config="marca">De Hierro Muebles</span> · Muebles de hierro y madera a medida</span><span>Santa Fe, Argentina</span></div></footer>
 
 <script>
@@ -397,6 +451,143 @@ const PRODUCTOS = [
     medidas:"100 × 50 × 85 cm", hierro:"Caño 40×40, pintura para exterior", madera:"Eucalipto con aceite", foto:"img/mesada-parrillera-patio.jpg" }
 ];
 PRODUCTOS.forEach(p=>{ if(!p.cat) p.cat="interior"; });
+
+/* ===== Textos de la ficha de cada mueble ===== */
+const DETALLE = {
+ "MR-01": {
+  "slug": "mesa-ratonera",
+  "intro": "Una mesa ratonera firme y sin vueltas para el centro del living. La tapa de madera maciza aguanta el uso de todos los días y el estante de abajo te deja tener revistas, libros o canastos a mano sin llenar la tapa.",
+  "mas": "La estructura es de caño soldado en todas sus uniones, así que no se afloja con el tiempo ni baila cuando la movés.",
+  "opciones": [
+   "Largo, ancho y alto a medida de tu sillón",
+   "Tapa de pino, paraíso o eucalipto",
+   "Estante inferior de madera o de metal",
+   "Hierro negro, grafito o en color"
+  ]
+ },
+ "MR-02": {
+  "slug": "mesa-ratonera-elevable",
+  "intro": "La tapa se levanta y queda a la altura justa para comer en el sillón o trabajar con la notebook. Debajo tiene un baúl para guardar controles, mantas o lo que quieras tener a mano pero fuera de la vista.",
+  "mas": "Lleva mecanismo elevable y un estante inferior abierto. Cuando la cerrás, es una ratonera común y prolija.",
+  "opciones": [
+   "Medidas a elección según tu living",
+   "Con o sin estante inferior",
+   "Madera natural o con tinte",
+   "Color del hierro a elección"
+  ]
+ },
+ "ML-01": {
+  "slug": "mesa-de-luz",
+  "intro": "Una mesa de luz compacta, con cajón y estante abajo para libros o el cargador. Es simple, prolija y combina con camas de madera, de hierro o tapizadas.",
+  "mas": "El cajón corre sobre guías metálicas. Se puede hacer de a una o en par, igual o en espejo.",
+  "opciones": [
+   "Alto a la medida de tu cama",
+   "Con uno o dos cajones",
+   "Con estante abierto o cerrado",
+   "Tirador de hierro o de madera"
+  ]
+ },
+ "RT-01": {
+  "slug": "rack-tv",
+  "intro": "Un rack bajo y largo para el living: de un lado puertas para guardar lo que no querés ver y del otro un módulo abierto para el deco, la consola o los parlantes.",
+  "mas": "Pensado para teles de hasta 65 pulgadas. Lleva pasacables atrás para que no queden cables a la vista.",
+  "opciones": [
+   "Largo a medida de tu pared",
+   "Cantidad de puertas, cajones y módulos abiertos",
+   "Puertas de madera o de chapa perforada",
+   "Con patas o colgado de la pared"
+  ]
+ },
+ "ES-01": {
+  "slug": "escritorio",
+  "intro": "Un escritorio con tapa amplia y estructura de hierro que no se mueve aunque escribas, dibujes o trabajes con dos pantallas. El estante bajo la tapa te deja el espacio libre de papeles y cuadernos.",
+  "mas": "Tiene un travesaño trasero que lo deja firme y que podés usar para ordenar los cables.",
+  "opciones": [
+   "Largo y profundidad según tu espacio",
+   "Con cajonera o estante lateral",
+   "Altura estándar o a tu medida",
+   "Tapa de pino de 1½\" o de eucalipto"
+  ]
+ },
+ "BI-01": {
+  "slug": "biblioteca",
+  "intro": "Una biblioteca alta, con laterales tipo escalera y seis estantes de madera. Sirve para libros, plantas, canastos o como separador de ambientes.",
+  "mas": "Se fija a la pared para que quede bien segura, sobre todo si hay chicos o mascotas en casa.",
+  "opciones": [
+   "Ancho, alto y cantidad de estantes",
+   "Estantes de pino, paraíso o eucalipto",
+   "Con fondo de madera o abierta",
+   "Con módulo de puertas abajo"
+  ]
+ },
+ "RC-01": {
+  "slug": "recibidor",
+  "intro": "El mueble justo para la entrada de casa: arriba un lugar para las llaves, el correo y algún portarretratos, y abajo estantes para zapatos y canastos.",
+  "mas": "Es angosto para no comerse el paso, y la tapa de madera con tinte nogal le da un toque cálido apenas entrás.",
+  "opciones": [
+   "Ancho y profundidad según tu pasillo",
+   "Cantidad de estantes",
+   "Con ganchos o percha para abrigos",
+   "Con cajón para llaves y papeles"
+  ]
+ },
+ "BQ-01": {
+  "slug": "banqueta-plegable",
+  "intro": "Una banqueta alta con asiento de madera maciza y apoyapiés, ideal para la barra, la isla de la cocina o un rincón de trabajo.",
+  "mas": "Se pliega con un perno pasante en el cruce de las patas, así que cuando no la usás la guardás contra la pared o detrás de una puerta.",
+  "opciones": [
+   "Altura según tu mesada o barra",
+   "Asiento cuadrado o redondo",
+   "Paraíso, eucalipto o pino",
+   "Se hace de a una o en juego"
+  ]
+ },
+ "MG-01": {
+  "slug": "mesa-para-galeria",
+  "intro": "Una mesa larga para juntarse con amigos o la familia debajo de la galería o en el quincho. Entran cómodas ocho personas y está hecha para durar a la intemperie.",
+  "mas": "Las patas son de caño grueso de 80×80 y el bastidor de 60×40, con pintura para exterior. La madera lleva aceite para que aguante el sol y la humedad.",
+  "opciones": [
+   "Largo para 6, 8, 10 o más personas",
+   "Tablones de eucalipto o lapacho",
+   "Con bancos o sillas que combinen",
+   "Tratamiento para exterior incluido"
+  ]
+ },
+ "BG-01": {
+  "slug": "banco-para-galeria",
+  "intro": "Un banco largo de tablones, para acompañar la mesa de galería o para tener solo, contra una pared del patio o del quincho.",
+  "mas": "Lleva patas de 50×50 y bastidor de 40×40, así que aguanta a varias personas sentadas sin moverse.",
+  "opciones": [
+   "Largo a medida de tu mesa",
+   "Con o sin respaldo",
+   "Madera de eucalipto o lapacho",
+   "Pintura y aceite para exterior"
+  ]
+ },
+ "LE-01": {
+  "slug": "lenero",
+  "intro": "Un leñero para tener la leña ordenada, seca y a mano al lado de la parrilla. Arriba queda un estante para la pava, los fósforos o las herramientas.",
+  "mas": "Los laterales son de metal desplegado: dejan circular el aire y la leña se mantiene seca.",
+  "opciones": [
+   "Alto y ancho según tu espacio",
+   "Con o sin estante superior",
+   "Con ruedas para moverlo",
+   "Pintura para exterior incluida"
+  ]
+ },
+ "MP-01": {
+  "slug": "mesada-parrillera",
+  "intro": "Una mesada auxiliar para tener todo a mano al lado de la parrilla: tabla, cuchillos, sal y el chimichurri arriba, y los utensilios colgados de los ganchos.",
+  "mas": "Abajo tiene un estante de listones para la vajilla o el carbón. Está terminada para usarse al aire libre.",
+  "opciones": [
+   "Largo y alto a la medida de tu parrilla",
+   "Con ganchos, porta rollo o porta cuchillos",
+   "Estante de listones o lleno",
+   "Con ruedas o fija"
+  ]
+ }
+};
+PRODUCTOS.forEach(p=>Object.assign(p,DETALLE[p.code]||{slug:p.code.toLowerCase(),intro:p.desc,mas:"",opciones:[]}));
 
 /* ===== Dibujos: cajas en proyección oblicua (medidas en cm) ===== */
 const MAT = {
@@ -510,17 +701,55 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 document.querySelectorAll("[data-config]").forEach(el=>{ const v=CONFIG[el.dataset.config]; if(v) el.textContent=v; });
 document.title = CONFIG.marca.includes("[") ? "Muebles de hierro y madera" : CONFIG.marca;
 
-document.getElementById("hero-plate").insertAdjacentHTML("afterbegin", drawModel("escritorio")+'<img class="foto" src="img/escritorio-ventanal.jpg" alt="Escritorio de hierro y madera en un estudio" onerror="this.remove()">');
+const fichaHref=p=>`#/mueble/${p.slug}`;
+
+/* ===== Carrusel de portada: recorre todo el catálogo ===== */
+const ORDEN_PORTADA=["ES-01","MR-01","MG-01","RT-01","BI-01","MR-02","MP-01","ML-01","RC-01","BG-01","BQ-01","LE-01"];
+const FOTO_PORTADA={"ES-01":"img/escritorio-ventanal.jpg"};
+const SLIDES=[...ORDEN_PORTADA.map(c=>PRODUCTOS.find(p=>p.code===c)).filter(Boolean), ...PRODUCTOS.filter(p=>!ORDEN_PORTADA.includes(p.code))];
+const slidesEl=document.getElementById("slides"), hero=document.getElementById("hero-plate");
+slidesEl.innerHTML=SLIDES.map((p,i)=>`<div class="slide${i?"":" on"}" aria-hidden="${i?"true":"false"}"><img ${i>1?"data-src":"src"}="${FOTO_PORTADA[p.code]||p.foto}" alt="${esc(p.nombre)} de hierro y madera" ${i?"":'fetchpriority="high"'}></div>`).join("");
+const slideEls=[...slidesEl.children], DUR=5500, reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let cur=0, timer=null, paused=false;
+function load(i){ const im=slideEls[i%SLIDES.length].querySelector("img"); if(im.dataset.src){ im.src=im.dataset.src; im.removeAttribute("data-src"); } }
+function show(i){
+  cur=(i+SLIDES.length)%SLIDES.length; const p=SLIDES[cur];
+  load(cur); load(cur+1);
+  slideEls.forEach((el,k)=>{ el.classList.toggle("on",k===cur); el.setAttribute("aria-hidden",String(k!==cur)); });
+  document.getElementById("slide-name").textContent=p.nombre;
+  document.getElementById("slide-cat").textContent=(p.cat==="exterior"?"Exterior":"Interior")+" · "+p.code;
+  const lab=document.getElementById("slide-label"); lab.href=fichaHref(p); lab.setAttribute("aria-label",`Ver detalles: ${p.nombre}`);
+  document.getElementById("slide-count").textContent=`${String(cur+1).padStart(2,"0")} / ${String(SLIDES.length).padStart(2,"0")}`;
+  play();
+}
+function play(){
+  clearTimeout(timer); const bar=document.getElementById("slide-bar");
+  bar.classList.remove("run"); bar.style.transitionDuration="0ms"; void bar.offsetWidth;
+  if(paused||reduce) return;
+  bar.style.transitionDuration=DUR+"ms"; bar.classList.add("run");
+  timer=setTimeout(()=>show(cur+1),DUR);
+}
+document.getElementById("slide-prev").addEventListener("click",()=>show(cur-1));
+document.getElementById("slide-next").addEventListener("click",()=>show(cur+1));
+hero.addEventListener("mouseenter",()=>{paused=true;play();});
+hero.addEventListener("mouseleave",()=>{paused=false;play();});
+hero.addEventListener("focusin",()=>{paused=true;play();});
+hero.addEventListener("focusout",()=>{paused=false;play();});
+let tx=null; hero.addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+hero.addEventListener("touchend",e=>{ if(tx===null) return; const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>40) show(cur+(dx<0?1:-1)); tx=null; });
+document.addEventListener("visibilitychange",()=>{ paused=document.hidden; play(); });
+show(0);
 
 const grid=document.getElementById("grid");
 grid.innerHTML = PRODUCTOS.map(p=>`
   <article class="card" data-cat="${p.cat}"${p.cat!=="interior"?" hidden":""}>
-    <div class="plate">${p.draw?drawModel(p.draw):""}<img class="foto" src="${p.foto}" alt="${esc(p.nombre)} de hierro y madera en un ambiente" loading="lazy" onerror="this.remove()"></div>
+    <a class="plate" href="${fichaHref(p)}" aria-label="Más detalles: ${esc(p.nombre)}">${p.draw?drawModel(p.draw):""}<img class="foto" src="${p.foto}" alt="${esc(p.nombre)} de hierro y madera en un ambiente" loading="lazy" onerror="this.remove()"></a>
     <div class="card-top"><h3>${esc(p.nombre)}</h3><span class="code">${p.code}</span></div>
     <p>${esc(p.desc)}</p>
     <dl class="specs"><dt>Medidas</dt><dd>${p.medidas} <span class="mono" style="color:var(--muted);font-size:12px">largo × prof. × alto</span></dd><dt>Hierro</dt><dd>${esc(p.hierro)}</dd><dt>Madera</dt><dd>${esc(p.madera)}</dd></dl>
     <div class="actions">
       <a class="btn primary small" href="#contacto" data-pick="${p.code}">Consultar</a>
+      <a class="btn small" href="${fichaHref(p)}">Más detalles</a>
     </div>
   </article>`).join("");
 
@@ -548,10 +777,63 @@ function elegir(code){
   if(!fMedidas.value.trim() || fMedidas.value===medidasAuto){ medidasAuto=p?p.medidas:""; fMedidas.value=medidasAuto; }
 }
 sel.addEventListener("change",()=>elegir(sel.value));
-document.querySelectorAll("[data-pick]").forEach(a=>a.addEventListener("click",()=>{
+document.addEventListener("click",e=>{
+  const a=e.target.closest("[data-pick]"); if(!a) return;
   elegir(a.dataset.pick);
   setTimeout(()=>document.getElementById("f-nombre").focus({preventScroll:true}),400);
-}));
+});
+
+/* ===== Ficha de cada mueble: se abre con #/mueble/<nombre> ===== */
+const landing=document.getElementById("inicio"), ficha=document.getElementById("ficha");
+function renderFicha(p){
+  const otros=PRODUCTOS.filter(x=>x.cat===p.cat&&x!==p).slice(0,3);
+  ficha.innerHTML=`<div class="wrap">
+    <nav class="crumbs" aria-label="Ubicación"><a href="#catalogo">Catálogo</a><span>/</span><span>${p.cat==="exterior"?"Exterior":"Interior"}</span><span>/</span><span>${esc(p.nombre)}</span></nav>
+    <div class="ficha-main">
+      <div class="plate">${p.draw?drawModel(p.draw):""}<img class="foto" src="${p.foto}" alt="${esc(p.nombre)} de hierro y madera en un ambiente" onerror="this.remove()"></div>
+      <div>
+        <div class="eyebrow">${p.cat==="exterior"?"Línea exterior":"Línea interior"} · ${p.code}</div>
+        <h1>${esc(p.nombre)}</h1>
+        <p class="intro">${esc(p.intro)}</p>
+        ${p.mas?`<p class="more">${esc(p.mas)}</p>`:""}
+        <dl class="specs">
+          <dt>Medidas</dt><dd>${p.medidas} <span class="mono" style="color:var(--muted);font-size:12px">largo × prof. × alto</span></dd>
+          <dt>Hierro</dt><dd>${esc(p.hierro)}</dd>
+          <dt>Madera</dt><dd>${esc(p.madera)}</dd>
+          <dt>Terminación</dt><dd>Hierro negro mate y madera natural. Otros colores a pedido.</dd>
+          <dt>Fabricación</dt><dd>20 días aprox.</dd>
+          <dt>Entrega</dt><dd>Envío o flete, lo coordinamos con vos</dd>
+        </dl>
+        <div class="ctas"><a class="btn primary" href="#contacto" data-pick="${p.code}">Consultar por este mueble</a><a class="btn" href="#asesoramiento">Quiero asesoramiento</a></div>
+      </div>
+    </div>
+    <div class="ficha-cols">
+      <div><h2>Lo podés personalizar</h2><ul>${p.opciones.map(o=>`<li>${esc(o)}</li>`).join("")}</ul></div>
+      <div><h2>Hecho para vos</h2><p>No hay stock: lo cortamos, soldamos y terminamos a mano cuando lo encargás. Antes de arrancar te mandamos el boceto con medidas y el precio cerrado.</p></div>
+      <div><h2>Seguí tu pedido</h2><p>Cada vez que tu mueble pasa de etapa te llega un mail con la novedad y la fecha estimada de entrega. <a href="#seguimiento">Ver las etapas</a>.</p></div>
+    </div>
+    ${otros.length?`<div class="related"><h2>Otros muebles ${p.cat==="exterior"?"para exterior":"para tu casa"}</h2><div class="mini">${otros.map(o=>`<a href="${fichaHref(o)}"><span class="plate">${o.draw?drawModel(o.draw):""}<img class="foto" src="${o.foto}" alt="" loading="lazy" onerror="this.remove()"></span><strong>${esc(o.nombre)}</strong></a>`).join("")}</div></div>`:""}
+  </div>`;
+}
+function route(){
+  const m=location.hash.match(/^#\/mueble\/([\w-]+)/), p=m&&PRODUCTOS.find(x=>x.slug===m[1]);
+  if(p){
+    renderFicha(p); landing.hidden=true; ficha.hidden=false; paused=true; play();
+    document.title=`${p.nombre} · ${CONFIG.marca}`; scrollTo({top:0,behavior:"instant"});
+    ficha.querySelector("h1").setAttribute("tabindex","-1"); ficha.querySelector("h1").focus({preventScroll:true});
+    return;
+  }
+  const venia=landing.hidden;
+  ficha.hidden=true; landing.hidden=false; document.title=CONFIG.marca;
+  if(venia){ paused=false; play();
+    const t=location.hash.length>1&&document.getElementById(location.hash.slice(1));
+    if(t) t.scrollIntoView({behavior:"instant"}); else scrollTo({top:0,behavior:"instant"});
+    if(location.hash==="#catalogo"&&window._ultimaCat){ document.querySelector(`.tab[data-tab="${window._ultimaCat}"]`)?.click(); }
+  }
+}
+addEventListener("hashchange",route);
+ficha.addEventListener("click",e=>{ if(e.target.closest('a[href="#catalogo"]')){ const p=PRODUCTOS.find(x=>location.hash.endsWith("/"+x.slug)); window._ultimaCat=p&&p.cat; } });
+route();
 
 const form=document.getElementById("form"), result=document.getElementById("result");
 form.addEventListener("submit",e=>{
