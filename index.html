@@ -201,7 +201,7 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
         <p class="lead">Mesas, racks, escritorios y muebles para la galería, soldados y armados a mano, uno por uno. Elegí un modelo del catálogo o pasanos tus medidas y lo fabricamos para vos.</p>
         <div class="ctas">
           <a class="btn primary" href="#catalogo">Ver catálogo</a>
-          <a class="btn" data-wa="Hola! Quería pedir un presupuesto para un mueble a medida." href="#contacto" target="_blank" rel="noopener">Escribinos por WhatsApp</a>
+          <a class="btn" href="#contacto" data-pick="otro">Escribinos</a>
         </div>
         <ul class="facts">
           <li>Hecho a pedido, listo en 20 días aprox.</li>
@@ -344,6 +344,7 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
             <pre id="result-text"></pre>
             <div class="form-actions">
               <a class="btn primary small" id="result-wa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+              <a class="btn primary small" id="result-ig" href="#" target="_blank" rel="noopener">Enviar por Instagram</a>
               <a class="btn small" id="result-mail" href="#">Enviar por mail</a>
               <button class="btn small" type="button" id="result-copy">Copiar mensaje</button>
               <span class="hint" id="copy-hint" aria-live="polite"></span>
@@ -502,7 +503,6 @@ function drawModel(key,{dims=false}={}){
 
 /* ===== Render ===== */
 const HAS_WA=!!CONFIG.whatsapp;
-const CANAL=HAS_WA?"WhatsApp":"Instagram";
 const waLink=t=>HAS_WA?`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(t)}`:`https://ig.me/m/${CONFIG.instagram}`;
 const mailLink=t=>`mailto:${CONFIG.email}?subject=${encodeURIComponent("Consulta por un mueble")}&body=${encodeURIComponent(t)}`;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -520,15 +520,16 @@ grid.innerHTML = PRODUCTOS.map(p=>`
     <p>${esc(p.desc)}</p>
     <dl class="specs"><dt>Medidas</dt><dd>${p.medidas} <span class="mono" style="color:var(--muted);font-size:12px">largo × prof. × alto</span></dd><dt>Hierro</dt><dd>${esc(p.hierro)}</dd><dt>Madera</dt><dd>${esc(p.madera)}</dd></dl>
     <div class="actions">
-      <a class="btn primary small" href="${waLink(`Hola! Quería consultar por el modelo ${p.nombre} (${p.code}).`)}" target="_blank" rel="noopener">Consultar por ${CANAL}</a>
-      <a class="btn small" href="#contacto" data-pick="${p.code}">Pedir con otras medidas</a>
+      <a class="btn primary small" href="#contacto" data-pick="${p.code}">Consultar</a>
     </div>
   </article>`).join("");
 
-document.querySelectorAll("[data-wa]").forEach(a=>{ a.href=waLink(a.dataset.wa); if(a.classList.contains("btn")) a.textContent=a.textContent.replace("WhatsApp",CANAL); });
+document.querySelectorAll("[data-wa]").forEach(a=>{ a.href=waLink(a.dataset.wa); });
 if(!HAS_WA) document.getElementById("wa-channel").hidden=true;
-document.getElementById("form-hint").textContent=`Arma el mensaje para que nos lo mandes por ${CANAL} o por mail.`;
-document.getElementById("result-wa").textContent=`Enviar por ${CANAL}`;
+const MEDIOS=(HAS_WA?"WhatsApp, ":"")+"Instagram o mail";
+document.getElementById("form-hint").textContent=`Armamos el mensaje y elegís si nos lo mandás por ${MEDIOS}.`;
+if(!HAS_WA) document.getElementById("result-wa").hidden=true;
+else document.getElementById("result-ig").classList.remove("primary");
 document.querySelectorAll("[data-ig]").forEach(a=>a.href=`https://instagram.com/${CONFIG.instagram}`);
 
 document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
@@ -539,7 +540,18 @@ document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
 const sel=document.getElementById("f-mueble");
 const opts=c=>PRODUCTOS.filter(p=>p.cat===c).map(p=>`<option value="${p.code}">${esc(p.nombre)} (${p.code})</option>`).join("");
 sel.innerHTML = `<optgroup label="Interior">${opts("interior")}</optgroup><optgroup label="Exterior">${opts("exterior")}</optgroup><option value="otro">Otro / diseño propio</option><option value="asesoramiento">No sé bien: quiero asesoramiento</option>`;
-document.querySelectorAll("[data-pick]").forEach(a=>a.addEventListener("click",()=>{ sel.value=a.dataset.pick; }));
+// Al tocar "Consultar" en un mueble: se elige en el formulario y se completan sus medidas de catálogo.
+const fMedidas=document.getElementById("f-medidas"); let medidasAuto="";
+function elegir(code){
+  sel.value=code;
+  const p=PRODUCTOS.find(x=>x.code===code);
+  if(!fMedidas.value.trim() || fMedidas.value===medidasAuto){ medidasAuto=p?p.medidas:""; fMedidas.value=medidasAuto; }
+}
+sel.addEventListener("change",()=>elegir(sel.value));
+document.querySelectorAll("[data-pick]").forEach(a=>a.addEventListener("click",()=>{
+  elegir(a.dataset.pick);
+  setTimeout(()=>document.getElementById("f-nombre").focus({preventScroll:true}),400);
+}));
 
 const form=document.getElementById("form"), result=document.getElementById("result");
 form.addEventListener("submit",e=>{
@@ -555,10 +567,15 @@ form.addEventListener("submit",e=>{
   if(f.get("mensaje").trim()) lines.push("", f.get("mensaje").trim());
   const txt=lines.join("\n");
   document.getElementById("result-text").textContent=txt;
-  document.getElementById("result-wa").href=waLink(txt);
+  if(HAS_WA) document.getElementById("result-wa").href=waLink(txt);
+  document.getElementById("result-ig").href=`https://ig.me/m/${CONFIG.instagram}`;
   document.getElementById("result-mail").href=mailLink(txt);
-  if(!HAS_WA) hint.textContent="Copiá el mensaje y pegalo en el chat de Instagram, o mandalo por mail.";
+  hint.textContent=HAS_WA?"Revisá el mensaje y mandalo por donde prefieras.":"Revisá el mensaje y mandalo por Instagram o por mail.";
   result.hidden=false;
+});
+document.getElementById("result-ig").addEventListener("click",()=>{
+  const txt=document.getElementById("result-text").textContent, h=document.getElementById("copy-hint");
+  try{ navigator.clipboard.writeText(txt).then(()=>h.textContent="Mensaje copiado: pegalo en el chat de Instagram.",()=>{}); }catch(_){}
 });
 document.getElementById("result-copy").addEventListener("click",()=>{
   const txt=document.getElementById("result-text").textContent, h=document.getElementById("copy-hint");
