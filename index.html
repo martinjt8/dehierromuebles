@@ -98,6 +98,8 @@ dl.specs{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-
 dl.specs dt{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
 dl.specs dd{margin:0;font-variant-numeric:tabular-nums}
 .card .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto}
+.aviso-img{margin:20px 0 0;font-size:14px;color:var(--muted)}
+.ficha-main .aviso-img{margin-top:12px;font-size:13px}
 .custom{margin-top:36px;border:2px dashed var(--line);padding:22px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
 .custom strong{font-family:var(--f-display);font-size:28px;text-transform:uppercase;font-weight:800}
 .custom p{margin:4px 0 0;color:var(--muted)}
@@ -273,13 +275,14 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
     <div class="wrap">
       <div class="sec-head">
         <div><div class="eyebrow">Catálogo 2026</div><h2>Nuestros muebles</h2></div>
-        <p>Cada modelo se puede hacer en otras medidas, con otra madera o en otro color. Las fotos son de referencia; te mandamos el boceto final antes de fabricar.</p>
+        <p>Cada modelo se puede hacer en otras medidas, con otra madera o en otro color. Antes de fabricar te mandamos el boceto final con medidas.</p>
       </div>
       <div class="tabs" role="group" aria-label="Filtrar catálogo">
         <button type="button" class="tab" data-tab="interior" aria-pressed="true">Interior</button>
         <button type="button" class="tab" data-tab="exterior" aria-pressed="false">Exterior: parrilla y galería</button>
       </div>
       <div class="grid" id="grid"></div>
+      <p class="aviso-img">Las imágenes son ilustrativas. Cada mueble se fabrica a pedido y puede variar en medidas, terminaciones y veta de la madera.</p>
       <div class="custom">
         <div><strong>¿Tenés otra idea?</strong><p>Mandanos una foto de referencia y las medidas del espacio. Lo dibujamos y te pasamos precio. Y si no sabés por dónde empezar, <a href="#asesoramiento">te asesoramos</a>.</p></div>
         <a class="btn primary" href="#contacto">Pedir algo a medida</a>
@@ -867,7 +870,7 @@ function renderFicha(p){
   ficha.innerHTML=`<div class="wrap">
     <nav class="crumbs" aria-label="Ubicación"><a href="#catalogo">Catálogo</a><span>/</span><span>${p.cat==="exterior"?"Exterior":"Interior"}</span><span>/</span><span>${esc(p.nombre)}</span></nav>
     <div class="ficha-main">
-      <div class="plate">${p.draw?drawModel(p.draw):""}<img class="foto" src="${p.foto}" alt="${esc(p.nombre)} de hierro y madera en un ambiente" onerror="this.remove()"></div>
+      <div><div class="plate">${p.draw?drawModel(p.draw):""}<img class="foto" src="${p.foto}" alt="${esc(p.nombre)} de hierro y madera en un ambiente" onerror="this.remove()"></div><p class="aviso-img">Las imágenes son ilustrativas. Cada mueble se fabrica a pedido y puede variar en medidas, terminaciones y veta de la madera.</p></div>
       <div>
         <div class="eyebrow">${p.cat==="exterior"?"Línea exterior":"Línea interior"} · ${p.code}</div>
         <h1>${esc(p.nombre)}</h1>
