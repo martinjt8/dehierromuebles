@@ -412,7 +412,7 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
 
 <footer><div class="wrap"><span>© 2026 <span data-config="marca">De Hierro Muebles</span> · Muebles de hierro y madera a medida</span><span>Santa Fe, Argentina</span></div></footer>
 
-<script>
+<script type="module">
 /* ===== DATOS PARA REEMPLAZAR: cambiá estos valores y se actualiza toda la página ===== */
 const CONFIG = {
   marca: "De Hierro Muebles",
@@ -459,6 +459,28 @@ const PRODUCTOS = [
     medidas:"280 × 170 × 210 cm", hierro:"Patas y travesaño 80×80, sillón 40×40, cadenas galvanizadas, pintura para exterior", madera:"Pino 1\" con aceite", foto:"img/hamaca-sillon-patio.jpg" }
 ];
 PRODUCTOS.forEach(p=>{ if(!p.cat) p.cat="interior"; });
+
+/* ===== Muebles pausados desde el backoffice =====
+   El backoffice publica en Firestore la lista de códigos pausados (documento
+   publico/catalogo, el único que se lee sin sesión). Los pausados no se muestran
+   en la portada, el catálogo, las fichas ni el formulario. Si Firebase no responde
+   a tiempo o algo falla, se muestra todo, como siempre. */
+const URL_PAUSADOS="https://firestore.googleapis.com/v1/projects/dehierromuebles-backoffice/databases/(default)/documents/publico/catalogo";
+async function leerPausados(){
+  try{
+    const ctrl=new AbortController(), t=setTimeout(()=>ctrl.abort(),2500);
+    const r=await fetch(URL_PAUSADOS,{signal:ctrl.signal,cache:"no-store"});
+    clearTimeout(t);
+    if(!r.ok) return [];
+    const j=await r.json();
+    const valores=j&&j.fields&&j.fields.pausados&&j.fields.pausados.arrayValue&&j.fields.pausados.arrayValue.values;
+    return Array.isArray(valores)?valores.map(v=>v.stringValue).filter(Boolean):[];
+  }catch(e){ return []; }
+}
+const PAUSADOS=await leerPausados();
+if(PRODUCTOS.some(p=>!PAUSADOS.includes(p.code))){
+  for(let i=PRODUCTOS.length-1;i>=0;i--) if(PAUSADOS.includes(PRODUCTOS[i].code)) PRODUCTOS.splice(i,1);
+}
 
 /* ===== Textos de la ficha de cada mueble ===== */
 const DETALLE = {
@@ -817,6 +839,9 @@ document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
   document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-pressed",String(x===t)));
   grid.querySelectorAll(".card").forEach(c=>c.hidden=c.dataset.cat!==t.dataset.tab);
 }));
+/* Si todos los muebles de una pestaña están pausados, la pestaña no se muestra. */
+document.querySelectorAll(".tab").forEach(t=>{ t.hidden=!PRODUCTOS.some(p=>p.cat===t.dataset.tab); });
+if(document.querySelector('.tab[data-tab="interior"]').hidden) document.querySelector(".tab:not([hidden])")?.click();
 
 const sel=document.getElementById("f-mueble");
 const opts=c=>PRODUCTOS.filter(p=>p.cat===c).map(p=>`<option value="${p.code}">${esc(p.nombre)} (${p.code})</option>`).join("");
