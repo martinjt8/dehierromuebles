@@ -217,6 +217,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
 textarea{min-height:110px;resize:vertical}
 .form-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .hint{font-size:13px;color:var(--muted)}
+.opcional{font-weight:400;color:var(--muted)}
 .result{border-left:4px solid var(--accent);padding:12px 14px;background:var(--bg);display:grid;gap:10px}
 .result pre{margin:0;white-space:pre-wrap;font-family:var(--f-mono);font-size:13px}
 @media (max-width:860px){.contact{grid-template-columns:1fr}}
@@ -390,6 +391,7 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
             <label for="f-medidas">Medidas aproximadas<input id="f-medidas" name="medidas" placeholder="Ej.: 140 × 45 × 50 cm"></label>
             <label for="f-zona">Barrio o localidad<input id="f-zona" name="zona" placeholder="Ej.: Candioti"></label>
           </div>
+          <label for="f-contacto"><span>¿Cómo te respondemos? <span class="opcional">(opcional)</span></span><input id="f-contacto" name="contacto" autocomplete="tel" maxlength="150" placeholder="Tu WhatsApp, mail o Instagram"></label>
           <label for="f-msg">Contanos un poco más<textarea id="f-msg" name="mensaje" placeholder="Madera, color del hierro, para qué lo vas a usar…"></textarea></label>
           <div class="form-actions">
             <button class="btn primary" type="submit">Armar consulta</button>
@@ -928,9 +930,14 @@ form.addEventListener("submit",e=>{
   const lines=[`Hola! Soy ${nombre}.`, f.get("mueble")==="asesoramiento"?"Quiero asesoramiento para elegir o diseñar un mueble.":`Quiero consultar por: ${p?`${p.nombre} (${p.code})`:"un mueble a medida"}.`];
   if(f.get("medidas").trim()) lines.push(`Medidas: ${f.get("medidas").trim()}.`);
   if(f.get("zona").trim()) lines.push(`Zona: ${f.get("zona").trim()}.`);
+  if(f.get("contacto").trim()) lines.push(`Mi contacto: ${f.get("contacto").trim()}.`);
   if(f.get("mensaje").trim()) lines.push("", f.get("mensaje").trim());
   const txt=lines.join("\n");
   document.getElementById("result-text").textContent=txt;
+  const codigo=f.get("mueble")||null;
+  consulta={ id:nuevoId(), guardada:false, nombre, contacto:f.get("contacto").trim()||null, codigo,
+    mueble:p?`${p.nombre} (${p.code})`:codigo==="asesoramiento"?"Asesoramiento":codigo==="otro"?"Mueble a medida":null,
+    medidas:f.get("medidas").trim()||null, zona:f.get("zona").trim()||null, texto:txt };
   if(HAS_WA) document.getElementById("result-wa").href=waLink(txt);
   document.getElementById("result-ig").href=`https://ig.me/m/${CONFIG.instagram}`;
   document.getElementById("result-mail").href=mailLink(txt);
@@ -938,6 +945,33 @@ form.addEventListener("submit",e=>{
   document.getElementById("copy-hint").textContent="Instagram no deja escribir el mensaje solo: al tocar «Enviar por Instagram» se copia y después lo pegás en el chat.";
   result.hidden=false;
 });
+/* ===== Cada consulta queda registrada en el backoffice =====
+   Al tocar un botón de envío (o "Copiar mensaje") se guarda la consulta en
+   Firestore (colección mensajes, que la página solo puede crear) y aparece como
+   mensaje nuevo en el backoffice. Se guarda una vez por consulta armada, con el
+   primer medio que se tocó. Si falla, el envío sigue igual. */
+const PROYECTO="projects/dehierromuebles-backoffice/databases/(default)/documents";
+const URL_MENSAJES=`https://firestore.googleapis.com/v1/${PROYECTO}:commit`;
+let consulta=null;
+function nuevoId(){
+  try{ return crypto.randomUUID(); }catch(_){ return Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,12); }
+}
+function guardarConsulta(medio){
+  if(!consulta||consulta.guardada) return;
+  consulta.guardada=true;
+  const t=v=>v?{stringValue:String(v).slice(0,200)}:{nullValue:null};
+  const fields={ nombre:{stringValue:consulta.nombre.slice(0,100)}, contacto:t(consulta.contacto), medio:{stringValue:medio},
+    codigo:t(consulta.codigo), mueble:t(consulta.mueble), medidas:t(consulta.medidas), zona:t(consulta.zona),
+    texto:{stringValue:consulta.texto.slice(0,5000)}, leido:{booleanValue:false}, archivado:{booleanValue:false}, clienteId:{nullValue:null} };
+  const cuerpo={ writes:[{ update:{ name:`${PROYECTO}/mensajes/${consulta.id}`, fields },
+    updateTransforms:[{ fieldPath:"recibido", setToServerValue:"REQUEST_TIME" }], currentDocument:{ exists:false } }] };
+  try{ fetch(URL_MENSAJES,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(cuerpo), keepalive:true }).catch(()=>{}); }catch(_){}
+}
+document.getElementById("result-wa").addEventListener("click",()=>guardarConsulta("whatsapp"));
+document.getElementById("result-ig").addEventListener("click",()=>guardarConsulta("instagram"));
+document.getElementById("result-mail").addEventListener("click",()=>guardarConsulta("mail"));
+document.getElementById("result-copy").addEventListener("click",()=>guardarConsulta("copiado"));
+
 /* Instagram no permite completar el mensaje desde un link: se copia al tocar el
    botón (antes de que se abra el chat) y la persona solo tiene que pegarlo. */
 function copiarYa(txt){
