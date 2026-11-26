@@ -935,7 +935,7 @@ form.addEventListener("submit",e=>{
   const txt=lines.join("\n");
   document.getElementById("result-text").textContent=txt;
   const codigo=f.get("mueble")||null;
-  consulta={ id:nuevoId(), guardada:false, nombre, contacto:f.get("contacto").trim()||null, codigo,
+  consulta={ id:nuevoId(), guardados:new Set(), nombre, contacto:f.get("contacto").trim()||null, codigo,
     mueble:p?`${p.nombre} (${p.code})`:codigo==="asesoramiento"?"Asesoramiento":codigo==="otro"?"Mueble a medida":null,
     medidas:f.get("medidas").trim()||null, zona:f.get("zona").trim()||null, texto:txt };
   if(HAS_WA) document.getElementById("result-wa").href=waLink(txt);
@@ -948,8 +948,8 @@ form.addEventListener("submit",e=>{
 /* ===== Cada consulta queda registrada en el backoffice =====
    Al tocar un botón de envío (o "Copiar mensaje") se guarda la consulta en
    Firestore (colección mensajes, que la página solo puede crear) y aparece como
-   mensaje nuevo en el backoffice. Se guarda una vez por consulta armada, con el
-   primer medio que se tocó. Si falla, el envío sigue igual. */
+   mensaje nuevo en el backoffice. Se guarda una vez por cada medio que se toca
+   (si prueba WhatsApp y después mail, llegan los dos). Si falla, el envío sigue igual. */
 const PROYECTO="projects/dehierromuebles-backoffice/databases/(default)/documents";
 const URL_MENSAJES=`https://firestore.googleapis.com/v1/${PROYECTO}:commit`;
 let consulta=null;
@@ -957,13 +957,13 @@ function nuevoId(){
   try{ return crypto.randomUUID(); }catch(_){ return Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,12); }
 }
 function guardarConsulta(medio){
-  if(!consulta||consulta.guardada) return;
-  consulta.guardada=true;
+  if(!consulta||consulta.guardados.has(medio)) return;
+  consulta.guardados.add(medio);
   const t=v=>v?{stringValue:String(v).slice(0,200)}:{nullValue:null};
   const fields={ nombre:{stringValue:consulta.nombre.slice(0,100)}, contacto:t(consulta.contacto), medio:{stringValue:medio},
     codigo:t(consulta.codigo), mueble:t(consulta.mueble), medidas:t(consulta.medidas), zona:t(consulta.zona),
     texto:{stringValue:consulta.texto.slice(0,5000)}, leido:{booleanValue:false}, archivado:{booleanValue:false}, clienteId:{nullValue:null} };
-  const cuerpo={ writes:[{ update:{ name:`${PROYECTO}/mensajes/${consulta.id}`, fields },
+  const cuerpo={ writes:[{ update:{ name:`${PROYECTO}/mensajes/${consulta.id}-${medio}`, fields },
     updateTransforms:[{ fieldPath:"recibido", setToServerValue:"REQUEST_TIME" }], currentDocument:{ exists:false } }] };
   try{ fetch(URL_MENSAJES,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(cuerpo), keepalive:true }).catch(()=>{}); }catch(_){}
 }
