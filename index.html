@@ -419,7 +419,9 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
 /* ===== DATOS PARA REEMPLAZAR: cambiá estos valores y se actualiza toda la página ===== */
 const CONFIG = {
   marca: "De Hierro Muebles",
-  whatsapp: "",            // número con código de país, sin + ni espacios (ej. 5493421234567). Vacío: las consultas van por Instagram y mail
+  // WhatsApp está todo preparado (botón del formulario, canal de contacto y links de "Consultar")
+  // pero apagado. Para activarlo solo hay que poner el número acá y publicar.
+  whatsapp: "",            // número con código de país, sin + ni espacios (ej. 5493421234567). Vacío: WhatsApp no se muestra y las consultas van por Instagram y mail
   whatsappVisible: "",   // cómo se muestra el número, ej. (0342) 123-4567
   instagram: "dehierromuebles.sf",
   email: "dehierromuebles.sf@gmail.com",
@@ -933,11 +935,23 @@ form.addEventListener("submit",e=>{
   document.getElementById("result-ig").href=`https://ig.me/m/${CONFIG.instagram}`;
   document.getElementById("result-mail").href=mailLink(txt);
   hint.textContent=HAS_WA?"Revisá el mensaje y mandalo por donde prefieras.":"Revisá el mensaje y mandalo por Instagram o por mail.";
+  document.getElementById("copy-hint").textContent="Instagram no deja escribir el mensaje solo: al tocar «Enviar por Instagram» se copia y después lo pegás en el chat.";
   result.hidden=false;
 });
+/* Instagram no permite completar el mensaje desde un link: se copia al tocar el
+   botón (antes de que se abra el chat) y la persona solo tiene que pegarlo. */
+function copiarYa(txt){
+  const ta=document.createElement("textarea"); ta.value=txt; ta.setAttribute("readonly","");
+  ta.style.cssText="position:fixed;top:0;left:0;opacity:0"; document.body.appendChild(ta);
+  ta.select(); ta.setSelectionRange(0,txt.length);
+  let ok=false; try{ ok=document.execCommand("copy"); }catch(_){}
+  ta.remove(); return ok;
+}
 document.getElementById("result-ig").addEventListener("click",()=>{
   const txt=document.getElementById("result-text").textContent, h=document.getElementById("copy-hint");
-  try{ navigator.clipboard.writeText(txt).then(()=>h.textContent="Mensaje copiado: pegalo en el chat de Instagram.",()=>{}); }catch(_){}
+  const listo=()=>h.textContent="Mensaje copiado: pegalo en el chat de Instagram.";
+  if(copiarYa(txt)) listo();
+  try{ navigator.clipboard.writeText(txt).then(listo,()=>{}); }catch(_){}
 });
 document.getElementById("result-copy").addEventListener("click",()=>{
   const txt=document.getElementById("result-text").textContent, h=document.getElementById("copy-hint");
