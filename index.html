@@ -452,7 +452,11 @@ const PRODUCTOS = [
   { cat:"exterior", code:"HD-01", nombre:"Hamaca doble", desc:"Estructura en A con dos asientos de madera colgados de cadenas. Para que los chicos se hamaquen juntos en el patio.",
     medidas:"240 × 160 × 210 cm", hierro:"Patas y travesaño 80×80, cadenas y ganchos con rulemán, pintura para exterior", madera:"Eucalipto con aceite", foto:"img/hamaca-doble-patio.jpg" },
   { cat:"exterior", code:"HS-01", nombre:"Hamaca con respaldo", desc:"Hamaca de un asiento con respaldo, para sentarse tranquilo en el jardín. Base con refuerzos, no hace falta amurarla.",
-    medidas:"170 × 130 × 200 cm", hierro:"Patas y travesaño 80×80, base 60×40, cadenas, pintura para exterior", madera:"Pino 1½\" con aceite", foto:"img/hamaca-simple-patio.jpg" }
+    medidas:"170 × 130 × 200 cm", hierro:"Patas y travesaño 80×80, base 60×40, cadenas, pintura para exterior", madera:"Pino 1½\" con aceite", foto:"img/hamaca-simple-patio.jpg" },
+  { cat:"exterior", code:"HC-01", nombre:"Hamaca combinada", desc:"Un sillón colgante para dos y una hamaca individual en la misma estructura, con mesita lateral para el mate. Grandes y chicos al mismo tiempo.",
+    medidas:"360 × 180 × 220 cm", hierro:"Patas y travesaño 80×80, sillón 40×40, cadenas galvanizadas, pintura para exterior", madera:"Pino 1\" con aceite", foto:"img/hamaca-combinada-patio.jpg" },
+  { cat:"exterior", code:"HL-01", nombre:"Hamaca sillón", desc:"Sillón colgante con respaldo de listones y apoyabrazos, con una mesita a cada lado para el mate o una bebida.",
+    medidas:"280 × 170 × 210 cm", hierro:"Patas y travesaño 80×80, sillón 40×40, cadenas galvanizadas, pintura para exterior", madera:"Pino 1\" con aceite", foto:"img/hamaca-sillon-patio.jpg" }
 ];
 PRODUCTOS.forEach(p=>{ if(!p.cat) p.cat="interior"; });
 
@@ -611,6 +615,28 @@ const DETALLE = {
    "Con almohadones a medida",
    "Color de la estructura a elección"
   ]
+ },
+ "HC-01": {
+  "slug": "hamaca-combinada",
+  "intro": "Una hamaca para toda la familia: un sillón colgante para dos personas y, al costado, una hamaca individual común para los chicos, todo en la misma estructura. En una de las patas lleva una mesita para apoyar el mate.",
+  "mas": "Como es larga, las patas y el travesaño van en caño de 80×80, con un refuerzo horizontal en cada A. El sillón tiene marco de 40×40 con respaldo y asiento de listones, y cuelga de cadenas galvanizadas que no se oxidan.",
+  "opciones": [
+   "Sillón para dos o tres personas",
+   "Una o dos hamacas individuales",
+   "Mesita a un lado o a los dos",
+   "Anclajes para fijarla al piso"
+  ]
+ },
+ "HL-01": {
+  "slug": "hamaca-sillon",
+  "intro": "Un sillón colgante para mecerse tranquilo en el jardín, con respaldo de listones, apoyabrazos y una mesita en cada costado de la estructura para el mate, un vaso o un libro.",
+  "mas": "La estructura en A es de caño de 80×80 y el sillón tiene marco de 40×40. Cuelga de cadenas galvanizadas y la madera va con aceite para exterior.",
+  "opciones": [
+   "Ancho para dos o tres personas",
+   "Con o sin mesitas laterales",
+   "Pino, eucalipto o lapacho",
+   "Con almohadones a medida"
+  ]
  }
 };
 PRODUCTOS.forEach(p=>Object.assign(p,DETALLE[p.code]||{slug:p.code.toLowerCase(),intro:p.desc,mas:"",opciones:[]}));
@@ -730,7 +756,7 @@ document.title = CONFIG.marca.includes("[") ? "Muebles de hierro y madera" : CON
 const fichaHref=p=>`#/mueble/${p.slug}`;
 
 /* ===== Carrusel de portada: recorre todo el catálogo ===== */
-const ORDEN_PORTADA=["ES-01","MR-01","MG-01","RT-01","BI-01","MR-02","MP-01","ML-01","RC-01","BG-01","BQ-01","LE-01","HD-01","HS-01"];
+const ORDEN_PORTADA=["ES-01","MR-01","MG-01","RT-01","BI-01","MR-02","MP-01","ML-01","RC-01","BG-01","BQ-01","LE-01","HD-01","HS-01","HC-01","HL-01"];
 const FOTO_PORTADA={"ES-01":"img/escritorio-ventanal.jpg"};
 const SLIDES=[...ORDEN_PORTADA.map(c=>PRODUCTOS.find(p=>p.code===c)).filter(Boolean), ...PRODUCTOS.filter(p=>!ORDEN_PORTADA.includes(p.code))];
 const slidesEl=document.getElementById("slides"), hero=document.getElementById("hero-plate");
