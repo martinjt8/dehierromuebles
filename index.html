@@ -98,6 +98,8 @@ dl.specs{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-
 dl.specs dt{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
 dl.specs dd{margin:0;font-variant-numeric:tabular-nums}
 .card .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto}
+.aviso-img{margin:20px 0 0;font-size:14px;color:var(--muted)}
+.ficha-main .aviso-img{margin-top:12px;font-size:13px}
 .custom{margin-top:36px;border:2px dashed var(--line);padding:22px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
 .custom strong{font-family:var(--f-display);font-size:28px;text-transform:uppercase;font-weight:800}
 .custom p{margin:4px 0 0;color:var(--muted)}
@@ -273,13 +275,14 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
     <div class="wrap">
       <div class="sec-head">
         <div><div class="eyebrow">Catálogo 2026</div><h2>Nuestros muebles</h2></div>
-        <p>Cada modelo se puede hacer en otras medidas, con otra madera o en otro color. Las fotos son de referencia; te mandamos el boceto final antes de fabricar.</p>
+        <p>Cada modelo se puede hacer en otras medidas, con otra madera o en otro color. Antes de fabricar te mandamos el boceto final con medidas.</p>
       </div>
       <div class="tabs" role="group" aria-label="Filtrar catálogo">
         <button type="button" class="tab" data-tab="interior" aria-pressed="true">Interior</button>
         <button type="button" class="tab" data-tab="exterior" aria-pressed="false">Exterior: parrilla y galería</button>
       </div>
       <div class="grid" id="grid"></div>
+      <p class="aviso-img">Las imágenes son ilustrativas. Cada mueble se fabrica a pedido y puede variar en medidas, terminaciones y veta de la madera.</p>
       <div class="custom">
         <div><strong>¿Tenés otra idea?</strong><p>Mandanos una foto de referencia y las medidas del espacio. Lo dibujamos y te pasamos precio. Y si no sabés por dónde empezar, <a href="#asesoramiento">te asesoramos</a>.</p></div>
         <a class="btn primary" href="#contacto">Pedir algo a medida</a>
@@ -416,7 +419,9 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:1
 /* ===== DATOS PARA REEMPLAZAR: cambiá estos valores y se actualiza toda la página ===== */
 const CONFIG = {
   marca: "De Hierro Muebles",
-  whatsapp: "",            // número con código de país, sin + ni espacios (ej. 5493421234567). Vacío: las consultas van por Instagram y mail
+  // WhatsApp está todo preparado (botón del formulario, canal de contacto y links de "Consultar")
+  // pero apagado. Para activarlo solo hay que poner el número acá y publicar.
+  whatsapp: "",            // número con código de país, sin + ni espacios (ej. 5493421234567). Vacío: WhatsApp no se muestra y las consultas van por Instagram y mail
   whatsappVisible: "",   // cómo se muestra el número, ej. (0342) 123-4567
   instagram: "dehierromuebles.sf",
   email: "dehierromuebles.sf@gmail.com",
@@ -867,7 +872,7 @@ function renderFicha(p){
   ficha.innerHTML=`<div class="wrap">
     <nav class="crumbs" aria-label="Ubicación"><a href="#catalogo">Catálogo</a><span>/</span><span>${p.cat==="exterior"?"Exterior":"Interior"}</span><span>/</span><span>${esc(p.nombre)}</span></nav>
     <div class="ficha-main">
-      <div class="plate">${p.draw?drawModel(p.draw):""}<img class="foto" src="${p.foto}" alt="${esc(p.nombre)} de hierro y madera en un ambiente" onerror="this.remove()"></div>
+      <div><div class="plate">${p.draw?drawModel(p.draw):""}<img class="foto" src="${p.foto}" alt="${esc(p.nombre)} de hierro y madera en un ambiente" onerror="this.remove()"></div><p class="aviso-img">Las imágenes son ilustrativas. Cada mueble se fabrica a pedido y puede variar en medidas, terminaciones y veta de la madera.</p></div>
       <div>
         <div class="eyebrow">${p.cat==="exterior"?"Línea exterior":"Línea interior"} · ${p.code}</div>
         <h1>${esc(p.nombre)}</h1>
@@ -930,11 +935,23 @@ form.addEventListener("submit",e=>{
   document.getElementById("result-ig").href=`https://ig.me/m/${CONFIG.instagram}`;
   document.getElementById("result-mail").href=mailLink(txt);
   hint.textContent=HAS_WA?"Revisá el mensaje y mandalo por donde prefieras.":"Revisá el mensaje y mandalo por Instagram o por mail.";
+  document.getElementById("copy-hint").textContent="Instagram no deja escribir el mensaje solo: al tocar «Enviar por Instagram» se copia y después lo pegás en el chat.";
   result.hidden=false;
 });
+/* Instagram no permite completar el mensaje desde un link: se copia al tocar el
+   botón (antes de que se abra el chat) y la persona solo tiene que pegarlo. */
+function copiarYa(txt){
+  const ta=document.createElement("textarea"); ta.value=txt; ta.setAttribute("readonly","");
+  ta.style.cssText="position:fixed;top:0;left:0;opacity:0"; document.body.appendChild(ta);
+  ta.select(); ta.setSelectionRange(0,txt.length);
+  let ok=false; try{ ok=document.execCommand("copy"); }catch(_){}
+  ta.remove(); return ok;
+}
 document.getElementById("result-ig").addEventListener("click",()=>{
   const txt=document.getElementById("result-text").textContent, h=document.getElementById("copy-hint");
-  try{ navigator.clipboard.writeText(txt).then(()=>h.textContent="Mensaje copiado: pegalo en el chat de Instagram.",()=>{}); }catch(_){}
+  const listo=()=>h.textContent="Mensaje copiado: pegalo en el chat de Instagram.";
+  if(copiarYa(txt)) listo();
+  try{ navigator.clipboard.writeText(txt).then(listo,()=>{}); }catch(_){}
 });
 document.getElementById("result-copy").addEventListener("click",()=>{
   const txt=document.getElementById("result-text").textContent, h=document.getElementById("copy-hint");
