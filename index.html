@@ -448,7 +448,11 @@ const PRODUCTOS = [
   { cat:"exterior", code:"LE-01", nombre:"Leñero", desc:"Para tener la leña ordenada y a mano al lado de la parrilla. Arriba, lugar para la pava y los fósforos.",
     medidas:"60 × 35 × 120 cm", hierro:"Caño 40×40 y metal desplegado, pintura para exterior", madera:"Eucalipto con aceite", foto:"img/lenero-parrilla.jpg" },
   { cat:"exterior", code:"MP-01", nombre:"Mesada parrillera", desc:"Mesa auxiliar para cortar y apoyar todo al lado de la parrilla. Ganchos para los utensilios y estante de listones abajo.",
-    medidas:"100 × 50 × 85 cm", hierro:"Caño 40×40, pintura para exterior", madera:"Eucalipto con aceite", foto:"img/mesada-parrillera-patio.jpg" }
+    medidas:"100 × 50 × 85 cm", hierro:"Caño 40×40, pintura para exterior", madera:"Eucalipto con aceite", foto:"img/mesada-parrillera-patio.jpg" },
+  { cat:"exterior", code:"HD-01", nombre:"Hamaca doble", desc:"Estructura en A con dos asientos de madera colgados de cadenas. Para que los chicos se hamaquen juntos en el patio.",
+    medidas:"240 × 160 × 210 cm", hierro:"Patas y travesaño 80×80, cadenas y ganchos con rulemán, pintura para exterior", madera:"Eucalipto con aceite", foto:"img/hamaca-doble-patio.jpg" },
+  { cat:"exterior", code:"HS-01", nombre:"Hamaca con respaldo", desc:"Hamaca de un asiento con respaldo, para sentarse tranquilo en el jardín. Base con refuerzos, no hace falta amurarla.",
+    medidas:"170 × 130 × 200 cm", hierro:"Patas y travesaño 80×80, base 60×40, cadenas, pintura para exterior", madera:"Pino 1½\" con aceite", foto:"img/hamaca-simple-patio.jpg" }
 ];
 PRODUCTOS.forEach(p=>{ if(!p.cat) p.cat="interior"; });
 
@@ -585,6 +589,28 @@ const DETALLE = {
    "Estante de listones o lleno",
    "Con ruedas o fija"
   ]
+ },
+ "HD-01": {
+  "slug": "hamaca-doble",
+  "intro": "Una hamaca doble para el patio o el jardín: estructura en A de hierro y dos asientos de madera, para que los chicos se hamaquen al mismo tiempo.",
+  "mas": "Las patas y el travesaño son de caño grueso de 80×80, para que no se mueva aunque se hamaquen fuerte. Los asientos cuelgan de cadenas con ganchos con rulemán, y todo lleva pintura para exterior.",
+  "opciones": [
+   "Uno, dos o tres asientos",
+   "Asientos de madera o de goma",
+   "Anclajes para fijarla al piso",
+   "Alto a medida según la edad de los chicos"
+  ]
+ },
+ "HS-01": {
+  "slug": "hamaca-con-respaldo",
+  "intro": "Una hamaca de un asiento con respaldo, para sentarse a tomar mate o leer en el jardín, meciéndose despacio.",
+  "mas": "La estructura es de caño de 80×80 y la base lleva refuerzos de 60×40 a cada lado, así queda firme sin amurarla. El asiento cuelga de cadenas y la madera va con aceite para exterior.",
+  "opciones": [
+   "Asiento para una o dos personas",
+   "Pino, eucalipto o lapacho",
+   "Con almohadones a medida",
+   "Color de la estructura a elección"
+  ]
  }
 };
 PRODUCTOS.forEach(p=>Object.assign(p,DETALLE[p.code]||{slug:p.code.toLowerCase(),intro:p.desc,mas:"",opciones:[]}));
@@ -704,7 +730,7 @@ document.title = CONFIG.marca.includes("[") ? "Muebles de hierro y madera" : CON
 const fichaHref=p=>`#/mueble/${p.slug}`;
 
 /* ===== Carrusel de portada: recorre todo el catálogo ===== */
-const ORDEN_PORTADA=["ES-01","MR-01","MG-01","RT-01","BI-01","MR-02","MP-01","ML-01","RC-01","BG-01","BQ-01","LE-01"];
+const ORDEN_PORTADA=["ES-01","MR-01","MG-01","RT-01","BI-01","MR-02","MP-01","ML-01","RC-01","BG-01","BQ-01","LE-01","HD-01","HS-01"];
 const FOTO_PORTADA={"ES-01":"img/escritorio-ventanal.jpg"};
 const SLIDES=[...ORDEN_PORTADA.map(c=>PRODUCTOS.find(p=>p.code===c)).filter(Boolean), ...PRODUCTOS.filter(p=>!ORDEN_PORTADA.includes(p.code))];
 const slidesEl=document.getElementById("slides"), hero=document.getElementById("hero-plate");
